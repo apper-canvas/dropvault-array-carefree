@@ -307,36 +307,8 @@ const MainFeature = () => {
     else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
     else return (bytes / 1073741824).toFixed(1) + ' GB';
   };
-            } else {
-              toast.error('File upload failed. Please try again.');
-            }
-          }, 500);
-        }
-        
-        return { ...prev, [fileId]: newProgress };
-      });
-      
-      // Record progress activity at 25%, 50%, and 75% milestones
-      setUploadProgress(prev => {
-        const currentProgress = prev[fileId] || 0;
-        const newProgress = Math.min(currentProgress + Math.random() * 10, 100);
-        
-        // Record milestone activities
-        if (Math.floor(currentProgress / 25) < Math.floor(newProgress / 25)) {
-          const milestone = Math.floor(newProgress / 25) * 25;
-          recordProgressMilestone(fileId, milestone);
-        }
-        
-        if (newProgress >= 100) {
-          clearInterval(interval);
-        }
-        
-        return { ...prev, [fileId]: newProgress };
-      });
-    }, 300);
-  };
   
-  // Pause or resume upload
+  // Record progress milestone for a file
   const togglePauseUpload = (fileId) => {
     setUploadStatus(prev => {
       const newStatus = prev[fileId] === 'paused' ? 'uploading' : 'paused';
