@@ -310,7 +310,6 @@ const MainFeature = () => {
   
   // Record progress milestone for a file
   const recordProgressMilestone = (fileId, milestone) => {
-  const recordProgressMilestone = (fileId, milestone) => {
     setFileActivities(prev => {
       const fileActivity = prev[fileId] || [];
       return {
@@ -325,6 +324,8 @@ const MainFeature = () => {
         }]
       };
     });
+  
+  // Simulate a download event for a file
   // Simulate a download event for a file
   const simulateDownload = (fileId) => {
     const file = files.find(f => f.id === fileId);
