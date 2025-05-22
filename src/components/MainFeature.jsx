@@ -324,8 +324,8 @@ const MainFeature = () => {
         }]
       };
     });
+  };
   
-  // Simulate a download event for a file
   // Simulate a download event for a file
   const simulateDownload = (fileId) => {
     const file = files.find(f => f.id === fileId);
