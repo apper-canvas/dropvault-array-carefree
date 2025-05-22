@@ -121,38 +121,192 @@ const MainFeature = () => {
         
         if (newProgress >= 100) {
           clearInterval(interval);
-          
+
           // Simulate some random failures for demo purposes (10% chance)
           const success = Math.random() > 0.1;
-          
+
           setTimeout(() => {
-            // Record completion or failure activity
-            const activityType = success ? 'upload-complete' : 'upload-fail';
-            const activityMessage = success ? 'File upload completed' : 'File upload failed';
-            const activityDetails = success 
-              ? `Successfully uploaded ${files.find(f => f.id === fileId)?.name}`
-              : `Failed to upload ${files.find(f => f.id === fileId)?.name}. Please try again.`;
-            const activityIcon = success ? 'check-circle' : 'alert-circle';
-            
-            setFileActivities(prev => {
-              const fileActivity = prev[fileId] || [];
-              return {
-                ...prev,
-                [fileId]: [...fileActivity, {
-                  id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                  type: activityType,
-                  timestamp: new Date(),
-                  message: activityMessage,
-                  details: activityDetails,
-                  icon: activityIcon
-                }]
-              };
-            });
-            
-            setUploadStatus(prevStatus => ({
-              ...prevStatus,
-              [fileId]: success ? 'completed' : 'failed'
-            }));
+            if (success) {
+              // Record completion activity
+              const activityType = 'upload-complete';
+              const activityMessage = 'File upload completed';
+              const activityDetails = `Successfully uploaded ${files.find(f => f.id === fileId)?.name}`;
+              const activityIcon = 'check-circle';
+              
+              setFileActivities(prev => {
+                const fileActivity = prev[fileId] || [];
+                return {
+                  ...prev,
+                  [fileId]: [...fileActivity, {
+                    id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    type: activityType,
+                    timestamp: new Date(),
+                    message: activityMessage,
+                    details: activityDetails,
+                    icon: activityIcon
+                  }]
+                };
+              });
+              
+              setUploadStatus(prevStatus => ({
+                ...prevStatus,
+                [fileId]: 'completed'
+              }));
+            } else {
+              // Record failure activity
+              const activityType = 'upload-fail';
+              const activityMessage = 'File upload failed';
+              const activityDetails = `Failed to upload ${files.find(f => f.id === fileId)?.name}. Please try again.`;
+              const activityIcon = 'alert-circle';
+              
+              setFileActivities(prev => {
+                const fileActivity = prev[fileId] || [];
+                return {
+                  ...prev,
+                  [fileId]: [...fileActivity, {
+                    id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    type: activityType,
+                    timestamp: new Date(),
+                    message: activityMessage,
+                    details: activityDetails,
+                    icon: activityIcon
+                  }]
+                };
+              });
+              
+              setUploadStatus(prevStatus => ({
+                ...prevStatus,
+                [fileId]: 'failed'
+              }));
+              
+              toast.error('File upload failed. Please try again.');
+            }
+          }, 500);
+        }
+        
+        return { ...prev, [fileId]: newProgress };
+      });
+      
+      // Record progress activity at 25%, 50%, and 75% milestones
+      setUploadProgress(prev => {
+        const currentProgress = prev[fileId] || 0;
+        const newProgress = Math.min(currentProgress + Math.random() * 10, 100);
+        
+        // Record milestone activities
+        if (Math.floor(currentProgress / 25) < Math.floor(newProgress / 25)) {
+          const milestone = Math.floor(newProgress / 25) * 25;
+          recordProgressMilestone(fileId, milestone);
+        }
+        
+        if (newProgress >= 100) {
+          clearInterval(interval);
+        }
+        
+        return { ...prev, [fileId]: newProgress };
+      });
+    }, 300);
+  };
+  
+  // Pause or resume upload
+  const togglePauseUpload = (fileId) => {
+    setUploadStatus(prev => {
+      const newStatus = prev[fileId] === 'paused' ? 'uploading' : 'paused';
+      
+      // Record pause/resume activity
+      setFileActivities(prevActivities => {
+        const fileActivity = prevActivities[fileId] || [];
+        return {
+          ...prevActivities,
+          [fileId]: [...fileActivity, {
+            id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: newStatus === 'paused' ? 'upload-pause' : 'upload-resume',
+            timestamp: new Date(),
+            message: newStatus === 'paused' ? 'Upload paused' : 'Upload resumed',
+            details: `${newStatus === 'paused' ? 'Paused' : 'Resumed'} uploading ${files.find(f => f.id === fileId)?.name}`,
+            icon: newStatus === 'paused' ? 'pause' : 'play'
+          }]
+        };
+      });
+      
+      if (newStatus === 'paused') {
+        toast.info('Upload paused');
+      } else {
+        toast.info('Upload resumed');
+        // Re-simulate upload if resuming
+        if (uploadProgress[fileId] < 100) {
+          simulateUpload(fileId);
+        }
+      }
+      
+      return { ...prev, [fileId]: newStatus };
+    });
+  };
+  
+  // Cancel upload and remove file
+  const cancelUpload = (fileId) => {
+    // Record file removal activity
+    setFileActivities(prevActivities => {
+      const fileActivity = prevActivities[fileId] || [];
+      const removedFile = files.find(f => f.id === fileId);
+      const activityCopy = [...fileActivity, {
+        id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'file-removed',
+        timestamp: new Date(),
+        message: 'File removed',
+        details: `Removed file ${removedFile?.name}`,
+        icon: 'trash-2'
+      }];
+      
+      // We'll keep the activities in memory for this demo even if file is removed
+      return { ...prevActivities, [fileId]: activityCopy };
+    });
+    
+    setFiles(prevFiles => prevFiles.filter(f => f.id !== fileId));
+    
+    // Clean up progress and status
+    setUploadProgress(prev => {
+      const newProgress = { ...prev };
+      delete newProgress[fileId];
+      return newProgress;
+    });
+    
+    setUploadStatus(prev => {
+      const newStatus = { ...prev };
+      delete newStatus[fileId];
+      return newStatus;
+    });
+    
+    toast.info('File removed');
+  };
+  
+  // Get appropriate icon based on file type
+  const getFileIcon = (mimeType) => {
+    if (mimeType.startsWith('image/')) {
+      return ImageIcon;
+    } else if (mimeType.startsWith('text/')) {
+      return FileTextIcon;
+    } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || mimeType.includes('csv')) {
+      return FileSpreadsheetIcon;
+    } else if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) {
+      return FilePresentationIcon;
+    } else if (mimeType.includes('compressed') || mimeType.includes('zip') || mimeType.includes('archive')) {
+      return FileArchiveIcon;
+    } else if (mimeType.startsWith('video/')) {
+      return FileVideoIcon;
+    } else if (mimeType.startsWith('audio/')) {
+      return FileAudioIcon;
+    } else {
+      return FileIcon;
+    }
+  };
+  
+  // Format file size
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' B';
+    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    else return (bytes / 1073741824).toFixed(1) + ' GB';
+  };
             } else {
               toast.error('File upload failed. Please try again.');
             }
