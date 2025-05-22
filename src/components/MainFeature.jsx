@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { toast } from 'react-toastify';
 import { getIcon } from '../utils/iconUtils';
 import { format } from 'date-fns';
@@ -23,12 +23,16 @@ const MainFeature = () => {
   const PauseIcon = getIcon('pause');
   const PlayIcon = getIcon('play');
   const FolderIcon = getIcon('folder');
+  const ClockIcon = getIcon('clock');
+  const DownloadIcon = getIcon('download');
+  const ShareIcon = getIcon('share');
   
   // States
   const [isDragging, setIsDragging] = useState(false);
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadStatus, setUploadStatus] = useState({});
+  const [fileActivities, setFileActivities] = useState({});
   const fileInputRef = useRef(null);
   
   // Drag and drop handlers
@@ -82,12 +86,27 @@ const MainFeature = () => {
     
     setFiles(prevFiles => [...prevFiles, ...newFiles]);
     
+    // Record the upload start activity for each file
+    newFiles.forEach(fileObj => {
+      const initialActivity = {
+        id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'upload-start',
+        timestamp: new Date(),
+        message: 'File upload started',
+        details: `Started uploading ${fileObj.name} (${formatFileSize(fileObj.size)})`,
+        icon: 'upload-cloud'
+      };
+      
+      setFileActivities(prev => ({
+        ...prev,
+        [fileObj.id]: [initialActivity]
+      }));
+    });
+    
     // Initialize upload for each file
     newFiles.forEach(fileObj => {
       simulateUpload(fileObj.id);
     });
-    
-    toast.success(`${newFiles.length} file${newFiles.length > 1 ? 's' : ''} added successfully`);
   };
   
   // Simulate file upload with progress
@@ -107,17 +126,55 @@ const MainFeature = () => {
           const success = Math.random() > 0.1;
           
           setTimeout(() => {
+            // Record completion or failure activity
+            const activityType = success ? 'upload-complete' : 'upload-fail';
+            const activityMessage = success ? 'File upload completed' : 'File upload failed';
+            const activityDetails = success 
+              ? `Successfully uploaded ${files.find(f => f.id === fileId)?.name}`
+              : `Failed to upload ${files.find(f => f.id === fileId)?.name}. Please try again.`;
+            const activityIcon = success ? 'check-circle' : 'alert-circle';
+            
+            setFileActivities(prev => {
+              const fileActivity = prev[fileId] || [];
+              return {
+                ...prev,
+                [fileId]: [...fileActivity, {
+                  id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                  type: activityType,
+                  timestamp: new Date(),
+                  message: activityMessage,
+                  details: activityDetails,
+                  icon: activityIcon
+                }]
+              };
+            });
+            
             setUploadStatus(prevStatus => ({
               ...prevStatus,
               [fileId]: success ? 'completed' : 'failed'
             }));
-            
-            if (success) {
-              toast.success('File uploaded successfully');
             } else {
               toast.error('File upload failed. Please try again.');
             }
           }, 500);
+        }
+        
+        return { ...prev, [fileId]: newProgress };
+      });
+      
+      // Record progress activity at 25%, 50%, and 75% milestones
+      setUploadProgress(prev => {
+        const currentProgress = prev[fileId] || 0;
+        const newProgress = Math.min(currentProgress + Math.random() * 10, 100);
+        
+        // Record milestone activities
+        if (Math.floor(currentProgress / 25) < Math.floor(newProgress / 25)) {
+          const milestone = Math.floor(newProgress / 25) * 25;
+          recordProgressMilestone(fileId, milestone);
+        }
+        
+        if (newProgress >= 100) {
+          clearInterval(interval);
         }
         
         return { ...prev, [fileId]: newProgress };
@@ -129,6 +186,22 @@ const MainFeature = () => {
   const togglePauseUpload = (fileId) => {
     setUploadStatus(prev => {
       const newStatus = prev[fileId] === 'paused' ? 'uploading' : 'paused';
+      
+      // Record pause/resume activity
+      setFileActivities(prevActivities => {
+        const fileActivity = prevActivities[fileId] || [];
+        return {
+          ...prevActivities,
+          [fileId]: [...fileActivity, {
+            id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: newStatus === 'paused' ? 'upload-pause' : 'upload-resume',
+            timestamp: new Date(),
+            message: newStatus === 'paused' ? 'Upload paused' : 'Upload resumed',
+            details: `${newStatus === 'paused' ? 'Paused' : 'Resumed'} uploading ${files.find(f => f.id === fileId)?.name}`,
+            icon: newStatus === 'paused' ? 'pause' : 'play'
+          }]
+        };
+      });
       
       if (newStatus === 'paused') {
         toast.info('Upload paused');
@@ -146,6 +219,23 @@ const MainFeature = () => {
   
   // Cancel upload and remove file
   const cancelUpload = (fileId) => {
+    // Record file removal activity
+    setFileActivities(prevActivities => {
+      const fileActivity = prevActivities[fileId] || [];
+      const removedFile = files.find(f => f.id === fileId);
+      const activityCopy = [...fileActivity, {
+        id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        type: 'file-removed',
+        timestamp: new Date(),
+        message: 'File removed',
+        details: `Removed file ${removedFile?.name}`,
+        icon: 'trash-2'
+      }];
+      
+      // We'll keep the activities in memory for this demo even if file is removed
+      return { ...prevActivities, [fileId]: activityCopy };
+    });
+    
     setFiles(prevFiles => prevFiles.filter(f => f.id !== fileId));
     
     // Clean up progress and status
@@ -191,6 +281,108 @@ const MainFeature = () => {
     else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
     else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
     else return (bytes / 1073741824).toFixed(1) + ' GB';
+  };
+
+  // Record progress milestone for a file
+  const recordProgressMilestone = (fileId, milestone) => {
+    setFileActivities(prev => {
+      const fileActivity = prev[fileId] || [];
+      return {
+        ...prev,
+        [fileId]: [...fileActivity, {
+          id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          type: 'upload-progress',
+          timestamp: new Date(),
+          message: `Upload progress: ${milestone}%`,
+          details: `${files.find(f => f.id === fileId)?.name} upload reached ${milestone}%`,
+          icon: 'loader'
+        }]
+      };
+    });
+  };
+  
+  // Simulate a download event for a file
+  const simulateDownload = (fileId) => {
+    const file = files.find(f => f.id === fileId);
+    if (!file) return;
+    
+    toast.info(`Starting download for ${file.name}`);
+    
+    // Record download start activity
+    setFileActivities(prev => {
+      const fileActivity = prev[fileId] || [];
+      return {
+        ...prev,
+        [fileId]: [...fileActivity, {
+          id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          type: 'download-start',
+          timestamp: new Date(),
+          message: 'File download started',
+          details: `Started downloading ${file.name}`,
+          icon: 'download'
+        }]
+      };
+    });
+    
+    // Simulate download completion after a delay
+    setTimeout(() => {
+      // Record download completion
+      setFileActivities(prev => {
+        const fileActivity = prev[fileId] || [];
+        return {
+          ...prev,
+          [fileId]: [...fileActivity, {
+            id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: 'download-complete',
+            timestamp: new Date(),
+            message: 'File download completed',
+            details: `Successfully downloaded ${file.name}`,
+            icon: 'check-circle'
+          }]
+        };
+      });
+      
+      toast.success(`Downloaded ${file.name} successfully`);
+    }, 2000);
+  };
+  
+  // Simulate a share event for a file
+  const simulateShare = (fileId) => {
+    const file = files.find(f => f.id === fileId);
+    if (!file) return;
+    
+    toast.info(`Generating share link for ${file.name}...`);
+    
+    // Record share activity
+    setTimeout(() => {
+      setFileActivities(prev => {
+        const fileActivity = prev[fileId] || [];
+        return {
+          ...prev,
+          [fileId]: [...fileActivity, {
+            id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+            type: 'file-shared',
+            timestamp: new Date(),
+            message: 'File shared',
+            details: `Shared ${file.name} (Link expires in 7 days)`,
+            icon: 'share'
+          }]
+        };
+      });
+      
+      toast.success(`Share link created for ${file.name}`);
+    }, 1500);
+  };
+  
+  // File detail panel states
+  const [selectedFileId, setSelectedFileId] = useState(null);
+  
+  // Get selected file
+  const selectedFile = files.find(file => file.id === selectedFileId);
+  
+  // Handler for clicking on a file
+  const handleFileClick = (fileId) => {
+    setSelectedFileId(prevId => prevId === fileId ? null : fileId);
   };
   
   return (
@@ -266,135 +458,248 @@ const MainFeature = () => {
       </div>
       
       {/* File List */}
-      {files.length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-surface-800 rounded-xl shadow-card overflow-hidden"
-        >
-          <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center">
-            <h3 className="font-medium">Uploads ({files.length})</h3>
-          </div>
-          
-          <div className="divide-y divide-surface-200 dark:divide-surface-700 max-h-96 overflow-y-auto">
-            <AnimatePresence>
-              {files.map(fileObj => {
-                const progress = uploadProgress[fileObj.id] || 0;
-                const status = uploadStatus[fileObj.id] || 'pending';
-                const IconComponent = getFileIcon(fileObj.file.type);
-                
-                return (
-                  <motion.div 
-                    key={fileObj.id}
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="p-4 flex flex-col sm:flex-row sm:items-center gap-4"
-                  >
-                    {/* File Icon and Info */}
-                    <div className="flex items-center flex-1 min-w-0">
-                      <div className="h-10 w-10 rounded-lg bg-surface-100 dark:bg-surface-700 flex items-center justify-center text-surface-600 dark:text-surface-300 mr-3 flex-shrink-0">
-                        <IconComponent className="h-5 w-5" />
-                      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Files Column */}
+        <div className={`lg:col-span-${selectedFileId ? 2 : 3}`}>
+          {files.length > 0 && (
+            <motion.div 
+              layout
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white dark:bg-surface-800 rounded-xl shadow-card overflow-hidden"
+            >
+              <div className="p-4 border-b border-surface-200 dark:border-surface-700 flex justify-between items-center">
+                <h3 className="font-medium">Uploads ({files.length})</h3>
+              </div>
+              
+              <div className="divide-y divide-surface-200 dark:divide-surface-700 max-h-96 overflow-y-auto">
+                <AnimatePresence>
+                  <LayoutGroup>
+                    {files.map(fileObj => {
+                      const progress = uploadProgress[fileObj.id] || 0;
+                      const status = uploadStatus[fileObj.id] || 'pending';
+                      const IconComponent = getFileIcon(fileObj.file.type);
+                      const isSelected = selectedFileId === fileObj.id;
                       
-                      <div className="min-w-0 flex-1">
-                        <h4 className="font-medium text-sm truncate mb-1" title={fileObj.name}>
-                          {fileObj.name}
-                        </h4>
-                        <div className="flex items-center text-xs text-surface-500">
-                          <span className="mr-3">{formatFileSize(fileObj.size)}</span>
-                          <span>{format(fileObj.uploadedAt, 'MMM d, h:mm a')}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Progress and Actions */}
-                    <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
-                      {/* Progress Bar */}
-                      <div className="w-full sm:w-32 flex items-center">
-                        <div className="flex-1 h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
-                          <div 
-                            className={`h-full rounded-full ${
-                              status === 'completed' 
-                                ? 'bg-green-500' 
-                                : status === 'failed' 
-                                  ? 'bg-red-500' 
-                                  : 'bg-primary'
-                            }`}
-                            style={{ width: `${progress}%` }}
-                          ></div>
-                        </div>
-                        <span className="ml-2 text-xs text-surface-500 w-9 text-right">
-                          {status === 'completed' ? '100%' : `${Math.round(progress)}%`}
-                        </span>
-                      </div>
-                      
-                      {/* Status and Actions */}
-                      <div className="flex items-center space-x-2">
-                        {/* Status Indicator */}
-                        <div className="flex items-center text-xs">
-                          {status === 'uploading' && (
-                            <span className="text-primary flex items-center">
-                              <LoaderIcon className="h-3 w-3 mr-1 animate-spin" />
-                              Uploading
-                            </span>
-                          )}
-                          {status === 'paused' && (
-                            <span className="text-amber-500 flex items-center">
-                              <PauseIcon className="h-3 w-3 mr-1" />
-                              Paused
-                            </span>
-                          )}
-                          {status === 'completed' && (
-                            <span className="text-green-500 flex items-center">
-                              <CheckCircleIcon className="h-3 w-3 mr-1" />
-                              Complete
-                            </span>
-                          )}
-                          {status === 'failed' && (
-                            <span className="text-red-500 flex items-center">
-                              <AlertCircleIcon className="h-3 w-3 mr-1" />
-                              Failed
-                            </span>
-                          )}
-                        </div>
-                        
-                        {/* Action Buttons */}
-                        <div className="flex space-x-1">
-                          {/* Pause/Resume Button */}
-                          {(status === 'uploading' || status === 'paused') && (
-                            <button 
-                              onClick={() => togglePauseUpload(fileObj.id)}
-                              className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
-                              title={status === 'paused' ? 'Resume' : 'Pause'}
-                            >
-                              {status === 'paused' ? (
-                                <PlayIcon className="h-4 w-4" />
-                              ) : (
-                                <PauseIcon className="h-4 w-4" />
-                              )}
-                            </button>
-                          )}
+                      return (
+                        <motion.div 
+                          key={fileObj.id}
+                          layout
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.3 }}
+                          className={`p-4 flex flex-col sm:flex-row sm:items-center gap-4 cursor-pointer ${
+                            isSelected ? 'bg-primary/5 dark:bg-primary/10' : 'hover:bg-surface-50 dark:hover:bg-surface-700/50'
+                          }`}
+                          onClick={() => handleFileClick(fileObj.id)}
+                        >
+                          {/* File Icon and Info */}
+                          <div className="flex items-center flex-1 min-w-0">
+                            <div className={`h-10 w-10 rounded-lg flex items-center justify-center mr-3 flex-shrink-0 ${
+                              isSelected 
+                                ? 'bg-primary/20 text-primary' 
+                                : 'bg-surface-100 dark:bg-surface-700 text-surface-600 dark:text-surface-300'
+                            }`}>
+                              <IconComponent className="h-5 w-5" />
+                            </div>
+                            
+                            <div className="min-w-0 flex-1">
+                              <h4 className="font-medium text-sm truncate mb-1" title={fileObj.name}>
+                                {fileObj.name}
+                              </h4>
+                              <div className="flex items-center text-xs text-surface-500">
+                                <span className="mr-3">{formatFileSize(fileObj.size)}</span>
+                                <span>{format(fileObj.uploadedAt, 'MMM d, h:mm a')}</span>
+                              </div>
+                            </div>
+                          </div>
                           
-                          {/* Cancel/Remove Button */}
-                          <button 
-                            onClick={() => cancelUpload(fileObj.id)}
-                            className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
-                            title="Remove"
-                          >
-                            <XIcon className="h-4 w-4" />
-                          </button>
+                          {/* Progress and Actions */}
+                          <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
+                            {/* Progress Bar */}
+                            <div className="w-full sm:w-32 flex items-center">
+                              <div className="flex-1 h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
+                                <div 
+                                  className={`h-full rounded-full ${
+                                    status === 'completed' 
+                                      ? 'bg-green-500' 
+                                      : status === 'failed' 
+                                        ? 'bg-red-500' 
+                                        : 'bg-primary'
+                                  }`}
+                                  style={{ width: `${progress}%` }}
+                                ></div>
+                              </div>
+                              <span className="ml-2 text-xs text-surface-500 w-9 text-right">
+                                {status === 'completed' ? '100%' : `${Math.round(progress)}%`}
+                              </span>
+                            </div>
+                            
+                            {/* Status and Actions */}
+                            <div className="flex items-center space-x-2">
+                              {/* Status Indicator */}
+                              <div className="flex items-center text-xs">
+                                {status === 'uploading' && (
+                                  <span className="text-primary flex items-center">
+                                    <LoaderIcon className="h-3 w-3 mr-1 animate-spin" />
+                                    Uploading
+                                  </span>
+                                )}
+                                {status === 'paused' && (
+                                  <span className="text-amber-500 flex items-center">
+                                    <PauseIcon className="h-3 w-3 mr-1" />
+                                    Paused
+                                  </span>
+                                )}
+                                {status === 'completed' && (
+                                  <span className="text-green-500 flex items-center">
+                                    <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                    Complete
+                                  </span>
+                                )}
+                                {status === 'failed' && (
+                                  <span className="text-red-500 flex items-center">
+                                    <AlertCircleIcon className="h-3 w-3 mr-1" />
+                                    Failed
+                                  </span>
+                                )}
+                              </div>
+                              
+                              {/* Action Buttons */}
+                              <div className="flex space-x-1" onClick={(e) => e.stopPropagation()}>
+                                {/* Pause/Resume Button */}
+                                {(status === 'uploading' || status === 'paused') && (
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      togglePauseUpload(fileObj.id);
+                                    }}
+                                    className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
+                                    title={status === 'paused' ? 'Resume' : 'Pause'}
+                                  >
+                                    {status === 'paused' ? (
+                                      <PlayIcon className="h-4 w-4" />
+                                    ) : (
+                                      <PauseIcon className="h-4 w-4" />
+                                    )}
+                                  </button>
+                                )}
+                                
+                                {/* Download Button for completed files */}
+                                {status === 'completed' && (
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      simulateDownload(fileObj.id);
+                                    }}
+                                    className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
+                                    title="Download"
+                                  >
+                                    <DownloadIcon className="h-4 w-4" />
+                                  </button>
+                                )}
+                                
+                                {/* Share Button for completed files */}
+                                {status === 'completed' && (
+                                  <button 
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      simulateShare(fileObj.id);
+                                    }}
+                                    className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
+                                    title="Share"
+                                  >
+                                    <ShareIcon className="h-4 w-4" />
+                                  </button>
+                                )}
+                                
+                                {/* Cancel/Remove Button */}
+                                <button 
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    cancelUpload(fileObj.id);
+                                    if (selectedFileId === fileObj.id) {
+                                      setSelectedFileId(null);
+                                    }
+                                  }}
+                                  className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-600 dark:text-surface-300"
+                                  title="Remove"
+                                >
+                                  <XIcon className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </LayoutGroup>
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          )}
+        </div>
+        
+        {/* File Timeline Panel */}
+        {selectedFileId && (
+          <motion.div 
+            layout
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="bg-white dark:bg-surface-800 rounded-xl shadow-card overflow-hidden lg:col-span-1"
+          >
+            <div className="p-4 border-b border-surface-200 dark:border-surface-700">
+              <div className="flex justify-between items-center">
+                <h3 className="font-medium flex items-center">
+                  <ClockIcon className="h-4 w-4 mr-2" />
+                  Activity Timeline
+                </h3>
+                <button 
+                  onClick={() => setSelectedFileId(null)}
+                  className="p-1 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-500"
+                >
+                  <XIcon className="h-4 w-4" />
+                </button>
+              </div>
+              {selectedFile && (
+                <div className="mt-2 text-sm text-surface-500">
+                  {selectedFile.name}
+                </div>
+              )}
+            </div>
+            
+            {/* Timeline */}
+            <div className="p-4 max-h-96 overflow-y-auto">
+              {selectedFile && (
+                <div className="file-timeline">
+                  {(fileActivities[selectedFileId] || []).sort((a, b) => 
+                    new Date(b.timestamp) - new Date(a.timestamp)
+                  ).map(activity => {
+                    const ActivityIcon = getIcon(activity.icon);
+                    
+                    return (
+                      <div key={activity.id} className="timeline-item">
+                        <div className="timeline-icon">
+                          <ActivityIcon className="h-4 w-4" />
+                        </div>
+                        <div className="timeline-content">
+                          <h4 className="timeline-title">{activity.message}</h4>
+                          <p className="timeline-details">{activity.details}</p>
+                          <p className="timeline-time">
+                            {format(new Date(activity.timestamp), 'MMM d, yyyy, h:mm:ss a')}
+                          </p>
                         </div>
                       </div>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </div>
-        </motion.div>
-      )}
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </div>
       
       {/* Storage Location Selection */}
       {files.length > 0 && (

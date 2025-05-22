@@ -75,4 +75,43 @@
   .neu-button {
     @apply dark:shadow-neu-dark shadow-neu-light;
   }
+  
+  /* File Timeline Styles */
+  .file-timeline {
+    @apply relative py-2;
+  }
+  
+  .timeline-item {
+    @apply relative pl-8 pb-6 last:pb-0;
+  }
+  
+  .timeline-item::before {
+    content: '';
+    @apply absolute left-[11px] top-7 bottom-0 w-[2px] bg-surface-200 dark:bg-surface-700;
+  }
+  
+  .timeline-item:last-child::before {
+    @apply hidden;
+  }
+  
+  .timeline-icon {
+    @apply absolute left-0 top-0 h-6 w-6 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary;
+    z-index: 1;
+  }
+  
+  .timeline-content {
+    @apply bg-surface-50 dark:bg-surface-700/50 p-3 rounded-lg;
+  }
+  
+  .timeline-title {
+    @apply text-sm font-medium mb-1;
+  }
+  
+  .timeline-details {
+    @apply text-xs text-surface-600 dark:text-surface-400 mb-2;
+  }
+  
+  .timeline-time {
+    @apply text-xs text-surface-500 dark:text-surface-500;
+  }
 }
