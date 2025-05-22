@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import { Sun, Moon } from 'lucide-react';
 import Home from './pages/Home';
+import UpgradeStorage from './pages/UpgradeStorage';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -46,6 +47,7 @@ function App() {
       {/* Main content */}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/upgrade-storage" element={<UpgradeStorage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       

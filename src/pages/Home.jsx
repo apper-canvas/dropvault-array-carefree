@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
 import { motion } from 'framer-motion';
@@ -71,10 +72,10 @@ const Home = () => {
         <div className="mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <h2 className="text-xl font-semibold">Your Storage</h2>
-            <button className="btn-outline text-sm">
+            <Link to="/upgrade-storage" className="btn-outline text-sm">
               <UploadIcon className="h-4 w-4 mr-2" />
               Upgrade Storage
-            </button>
+            </Link>
           </div>
           
           <div className="bg-white dark:bg-surface-800 rounded-xl p-4 shadow-card">
