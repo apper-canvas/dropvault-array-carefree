@@ -309,107 +309,7 @@ const MainFeature = () => {
   };
   
   // Record progress milestone for a file
-  const togglePauseUpload = (fileId) => {
-    setUploadStatus(prev => {
-      const newStatus = prev[fileId] === 'paused' ? 'uploading' : 'paused';
-      
-      // Record pause/resume activity
-      setFileActivities(prevActivities => {
-        const fileActivity = prevActivities[fileId] || [];
-        return {
-          ...prevActivities,
-          [fileId]: [...fileActivity, {
-            id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            type: newStatus === 'paused' ? 'upload-pause' : 'upload-resume',
-            timestamp: new Date(),
-            message: newStatus === 'paused' ? 'Upload paused' : 'Upload resumed',
-            details: `${newStatus === 'paused' ? 'Paused' : 'Resumed'} uploading ${files.find(f => f.id === fileId)?.name}`,
-            icon: newStatus === 'paused' ? 'pause' : 'play'
-          }]
-        };
-      });
-      
-      if (newStatus === 'paused') {
-        toast.info('Upload paused');
-      } else {
-        toast.info('Upload resumed');
-        // Re-simulate upload if resuming
-        if (uploadProgress[fileId] < 100) {
-          simulateUpload(fileId);
-        }
-      }
-      
-      return { ...prev, [fileId]: newStatus };
-    });
-  };
-  
-  // Cancel upload and remove file
-  const cancelUpload = (fileId) => {
-    // Record file removal activity
-    setFileActivities(prevActivities => {
-      const fileActivity = prevActivities[fileId] || [];
-      const removedFile = files.find(f => f.id === fileId);
-      const activityCopy = [...fileActivity, {
-        id: `activity-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-        type: 'file-removed',
-        timestamp: new Date(),
-        message: 'File removed',
-        details: `Removed file ${removedFile?.name}`,
-        icon: 'trash-2'
-      }];
-      
-      // We'll keep the activities in memory for this demo even if file is removed
-      return { ...prevActivities, [fileId]: activityCopy };
-    });
-    
-    setFiles(prevFiles => prevFiles.filter(f => f.id !== fileId));
-    
-    // Clean up progress and status
-    setUploadProgress(prev => {
-      const newProgress = { ...prev };
-      delete newProgress[fileId];
-      return newProgress;
-    });
-    
-    setUploadStatus(prev => {
-      const newStatus = { ...prev };
-      delete newStatus[fileId];
-      return newStatus;
-    });
-    
-    toast.info('File removed');
-  };
-  
-  // Get appropriate icon based on file type
-  const getFileIcon = (mimeType) => {
-    if (mimeType.startsWith('image/')) {
-      return ImageIcon;
-    } else if (mimeType.startsWith('text/')) {
-      return FileTextIcon;
-    } else if (mimeType.includes('spreadsheet') || mimeType.includes('excel') || mimeType.includes('csv')) {
-      return FileSpreadsheetIcon;
-    } else if (mimeType.includes('presentation') || mimeType.includes('powerpoint')) {
-      return FilePresentationIcon;
-    } else if (mimeType.includes('compressed') || mimeType.includes('zip') || mimeType.includes('archive')) {
-      return FileArchiveIcon;
-    } else if (mimeType.startsWith('video/')) {
-      return FileVideoIcon;
-    } else if (mimeType.startsWith('audio/')) {
-      return FileAudioIcon;
-    } else {
-      return FileIcon;
-    }
-  };
-  
-  // Format file size
-  const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-    else if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
-    else return (bytes / 1073741824).toFixed(1) + ' GB';
-  };
-
-  // Record progress milestone for a file
+  const recordProgressMilestone = (fileId, milestone) => {
   const recordProgressMilestone = (fileId, milestone) => {
     setFileActivities(prev => {
       const fileActivity = prev[fileId] || [];
@@ -425,8 +325,6 @@ const MainFeature = () => {
         }]
       };
     });
-  };
-  
   // Simulate a download event for a file
   const simulateDownload = (fileId) => {
     const file = files.find(f => f.id === fileId);
