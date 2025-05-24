@@ -4,8 +4,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import { Sun, Moon } from 'lucide-react';
 import Home from './pages/Home';
 import UpgradeStorage from './pages/UpgradeStorage';
-import PrivacyPolicy from './pages/PrivacyPolicy';
-import TermsOfService from './pages/TermsOfService';
 import Contact from './pages/Contact';
 import NotFound from './pages/NotFound';
 
@@ -50,9 +48,6 @@ function App() {
       {/* Main content */}
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/upgrade-storage" element={<UpgradeStorage />} />
-        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-        <Route path="/terms-of-service" element={<TermsOfService />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

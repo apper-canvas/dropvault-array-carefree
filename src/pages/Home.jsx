@@ -129,8 +129,6 @@ const Home = () => {
           <div className="flex flex-col md:flex-row items-center justify-between text-sm text-surface-500">
             <p>© 2023 DropVault. All rights reserved.</p>
             <div className="flex space-x-4 mt-4 md:mt-0">
-              <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-              <Link to="/terms-of-service" className="hover:text-primary transition-colors">Terms of Service</Link>
               <Link to="/contact" className="hover:text-primary transition-colors">Contact</Link>
             </div>
           </div>
