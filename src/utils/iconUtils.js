@@ -45,7 +45,8 @@ export const getIcon = (iconName) => {
   const iconMappings = {
     // File type icons
     'file-audio': 'FileAudio',
-    'file-image': 'FileImage',
+    'file-image': 'Image',
+    'image': 'Image',
     'file-video': 'FileVideo',
     'file-x': 'FileX',
     'file-spreadsheet': 'FileSpreadsheet',
@@ -80,7 +81,12 @@ export const getIcon = (iconName) => {
     'sun': 'Sun',
     'moon': 'Moon',
     'trash-2': 'Trash2',
-    'help-circle': 'HelpCircle'
+    'help-circle': 'HelpCircle',
+    'mail': 'Mail',
+    'phone': 'Phone',
+    'map-pin': 'MapPin',
+    'send': 'Send',
+    'chevron-down': 'ChevronDown'
   };
   
   // Try the mapping
@@ -92,11 +98,6 @@ export const getIcon = (iconName) => {
   }
   
   // Step 6: Try some common variations
-  const variations = [
-    componentName.replace(/Icon$/, ''), // Remove Icon suffix if present
-    componentName + 'Icon', // Add Icon suffix
-    iconName.replace(/-/g, '').toLowerCase(), // Remove dashes and lowercase
-  ];
   
   // Fallback with console warning for debugging
   console.warn(`Icon "${iconName}" not found in Lucide (tried "${componentName}" and mappings), using HelpCircle instead`);
