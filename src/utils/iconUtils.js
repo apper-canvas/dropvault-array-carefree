@@ -35,14 +35,19 @@ export const getIcon = (iconName) => {
   // Step 3: Check if we have a valid component after transformation
   if (LucideIcons[componentName] && typeof LucideIcons[componentName] === 'function') {
     return LucideIcons[componentName];
+  }
+  
+  // Step 4: Try removing spaces and underscores (user_circle → UserCircle)
+  const noSpaces = iconName
+    .replace(/[\s_-]+/g, ' ')
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join('');
+  
+  if (LucideIcons[noSpaces] && typeof LucideIcons[noSpaces] === 'function') {
     return LucideIcons[noSpaces];
   }
   
-  }
-  
-  // Step 4: Advanced retry - try various transformations if needed
-  // Try removing spaces and underscores (user_circle → UserCircle)
-  if (LucideIcons[noSpaces] && typeof LucideIcons[noSpaces] === 'function') {
   // Step 5: Try common icon mappings
   const iconMappings = {
     // File type icons
