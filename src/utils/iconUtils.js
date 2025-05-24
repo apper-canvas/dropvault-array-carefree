@@ -83,9 +83,6 @@ export const getIcon = (iconName) => {
     'credit-card': 'CreditCard',
     'database': 'Database',
     'shield': 'Shield',
-  
-  const mappedName = iconMappings[iconName.toLowerCase()];
-  if (mappedName) {
     'server': 'Server',
     'zap': 'Zap',
     'sun': 'Sun',
@@ -94,6 +91,13 @@ export const getIcon = (iconName) => {
     'help-circle': 'HelpCircle',
     'mail': 'Mail',
     'chevron-down': 'ChevronDown'
+  };
+
+  const mappedName = iconMappings[iconName.toLowerCase()];
+  if (mappedName) {
+    if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
+      return LucideIcons[mappedName];
+    }
   };
     if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
       return LucideIcons[mappedName];
@@ -105,14 +109,4 @@ export const getIcon = (iconName) => {
   // Fallback with console warning for debugging
   console.warn(`Icon "${iconName}" not found in Lucide (tried "${componentName}" and mappings), using HelpCircle instead`);
   return LucideIcons.HelpCircle;
-  // Try inserting number without space (barChart2 → BarChart2)
-  const numberPattern = /([A-Za-z])(\d+)$/;
-  const withNumber = componentName.replace(numberPattern, '$1$2');
-  if (LucideIcons[withNumber] && typeof LucideIcons[withNumber] === 'function') {
-    return LucideIcons[withNumber];
-  }
-  
-  // Fallback with console warning for debugging
-  console.warn(`Icon "${iconName}" not found in Lucide (tried "${componentName}"), using Smile instead`);
-  return LucideIcons.Smile;
 };
