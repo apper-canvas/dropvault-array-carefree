@@ -93,9 +93,6 @@ export const getIcon = (iconName) => {
     'trash-2': 'Trash2',
     'help-circle': 'HelpCircle',
     'mail': 'Mail',
-    'phone': 'Phone',
-    'map-pin': 'MapPin',
-    'send': 'Send',
     'chevron-down': 'ChevronDown'
   };
     if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
