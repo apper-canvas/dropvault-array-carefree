@@ -83,6 +83,9 @@ export const getIcon = (iconName) => {
     'credit-card': 'CreditCard',
     'database': 'Database',
     'shield': 'Shield',
+  
+  const mappedName = iconMappings[iconName.toLowerCase()];
+  if (mappedName) {
     'server': 'Server',
     'zap': 'Zap',
     'sun': 'Sun',
