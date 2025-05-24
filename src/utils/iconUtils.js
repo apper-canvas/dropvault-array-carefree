@@ -35,11 +35,13 @@ export const getIcon = (iconName) => {
   // Step 3: Check if we have a valid component after transformation
   if (LucideIcons[componentName] && typeof LucideIcons[componentName] === 'function') {
     return LucideIcons[componentName];
+    return LucideIcons[noSpaces];
+  }
+  
   }
   
   // Step 4: Advanced retry - try various transformations if needed
   // Try removing spaces and underscores (user_circle → UserCircle)
-  const noSpaces = componentName.replace(/[\s_]/g, '');
   if (LucideIcons[noSpaces] && typeof LucideIcons[noSpaces] === 'function') {
   // Step 5: Try common icon mappings
   const iconMappings = {
@@ -88,10 +90,6 @@ export const getIcon = (iconName) => {
     'send': 'Send',
     'chevron-down': 'ChevronDown'
   };
-  
-  // Try the mapping
-  if (iconMappings[iconName]) {
-    const mappedName = iconMappings[iconName];
     if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
       return LucideIcons[mappedName];
     }
