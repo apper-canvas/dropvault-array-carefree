@@ -9,6 +9,8 @@ const TermsOfService = () => {
   const CheckCircleIcon = getIcon('check-circle');
   const XCircleIcon = getIcon('x-circle');
 
+  return (
+
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
 
       {/* Content */}
