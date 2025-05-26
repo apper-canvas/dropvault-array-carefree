@@ -133,6 +133,8 @@ const FAQ = () => {
       )
     : [];
 
+  return (
+
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900 pt-8">
 
       {/* Content */}
