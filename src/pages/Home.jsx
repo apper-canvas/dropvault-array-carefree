@@ -208,6 +208,8 @@ const Home = () => {
             </div>
           </div>
 
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+
           {/* Storage Stats Cards */}
             <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
               <div className="text-2xl font-bold text-primary">156</div>
@@ -227,6 +229,8 @@ const Home = () => {
               <div className="text-sm text-surface-600 dark:text-surface-400">Available</div>
             </div>
           </div>
+          </div>
+
         </div>
 
         
