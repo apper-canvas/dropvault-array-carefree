@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
 import Chart from 'react-apexcharts';
@@ -210,20 +209,11 @@ const Home = () => {
           </div>
 
           {/* Storage Stats Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Storage Usage</h3>
-                  <Link 
-                    to="/upgrade" 
-                    className="btn-primary text-sm px-3 py-1.5 hover:bg-primary-dark transition-colors"
-                  >
-                    Upgrade Storage
-                  </Link>
-                </div>
-
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
               <div className="text-2xl font-bold text-primary">156</div>
               <div className="text-sm text-surface-600 dark:text-surface-400">Total Files</div>
             </div>
+
             <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
               <div className="text-2xl font-bold text-secondary">12</div>
               <div className="text-sm text-surface-600 dark:text-surface-400">Folders</div>
