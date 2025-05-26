@@ -5,6 +5,11 @@ import { Sun, Moon } from 'lucide-react';
 import Home from './pages/Home';
 import UpgradeStorage from './pages/UpgradeStorage';
 import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsOfService from './pages/TermsOfService';
+import About from './pages/About';
+import FAQ from './pages/FAQ';
+
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -50,6 +55,11 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/upgrade-storage" element={<UpgradeStorage />} />
 
+
+        <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/faq" element={<FAQ />} />
 
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
