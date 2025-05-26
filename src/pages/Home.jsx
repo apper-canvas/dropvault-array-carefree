@@ -268,7 +268,6 @@ const Home = () => {
         )}
       </main>
 
-      </main>
 
       
       {/* Footer */}
