@@ -94,19 +94,11 @@ export const getIcon = (iconName) => {
   };
 
   const mappedName = iconMappings[iconName.toLowerCase()];
-  if (mappedName) {
-    if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
-      return LucideIcons[mappedName];
-    }
-  };
-    if (LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
-      return LucideIcons[mappedName];
-    }
+  if (mappedName && LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
+    return LucideIcons[mappedName];
   }
   
-  // Step 6: Try some common variations
-  
-  // Fallback with console warning for debugging
+  // Step 6: Fallback with console warning for debugging
   console.warn(`Icon "${iconName}" not found in Lucide (tried "${componentName}" and mappings), using HelpCircle instead`);
   return LucideIcons.HelpCircle;
 };
