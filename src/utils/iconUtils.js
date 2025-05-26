@@ -91,7 +91,7 @@ export const getIcon = (iconName) => {
     'mail': 'Mail',
     'chevron-down': 'ChevronDown',
     
-    // Navigation and Header icons
+    // Navigation and Header icons - COMPREHENSIVE MAPPING
     'menu': 'Menu',
     'search': 'Search',
     'bell': 'Bell',
@@ -102,6 +102,57 @@ export const getIcon = (iconName) => {
     'upload': 'Upload',
     'layout-dashboard': 'LayoutDashboard',
     'bar-chart-3': 'BarChart3',
+    'analytics': 'BarChart3',
+    'activity': 'Activity',
+    'recent': 'Clock',
+    'shared': 'Share2',
+    'trash': 'Trash2',
+    'profile': 'User',
+    'billing': 'CreditCard',
+    'upgrade': 'Zap',
+    'faq': 'HelpCircle',
+    'contact': 'Mail',
+    'support': 'Mail',
+    'about': 'Info',
+    'docs': 'Book',
+    'documentation': 'Book',
+    
+    // Dashboard specific icons
+    'overview': 'LayoutDashboard',
+    'dashboard': 'LayoutDashboard',
+    'chart': 'BarChart3',
+    'bar-chart': 'BarChart3',
+    'statistics': 'BarChart3',
+    
+    // File management icons
+    'my-files': 'Folder',
+    'files': 'Folder',
+    'shared-with-me': 'Share2',
+    'shared-files': 'Share2',
+    'recent-files': 'Clock',
+    'deleted': 'Trash2',
+    'recycle-bin': 'Trash2',
+    
+    // Account management icons
+    'account': 'User',
+    'user-profile': 'User',
+    'preferences': 'Settings',
+    'configuration': 'Settings',
+    'payment': 'CreditCard',
+    'subscription': 'CreditCard',
+    'upgrade-storage': 'Zap',
+    'storage-upgrade': 'Zap',
+    'premium': 'Zap',
+    
+    // Help and support icons
+    'help': 'HelpCircle',
+    'question': 'HelpCircle',
+    'support-contact': 'Mail',
+    'email': 'Mail',
+    'information': 'Info',
+    'guide': 'Book',
+    'manual': 'Book',
+    'tutorial': 'Book',
     
     // Additional common icons
     'globe': 'Globe',
@@ -109,15 +160,43 @@ export const getIcon = (iconName) => {
     'heart': 'Heart',
     'eye': 'Eye',
     'alert-triangle': 'AlertTriangle',
-    'file-text': 'FileText',
     'x-circle': 'XCircle',
     'message-circle': 'MessageCircle',
     'send': 'Send',
     'phone': 'Phone',
     'map-pin': 'MapPin',
     'book': 'Book',
-    'info': 'Info'
+    'info': 'Info',
+    
+    // Icon variations and aliases
+    'dashboard-layout': 'LayoutDashboard',
+    'layout': 'LayoutDashboard',
+    'chart-bar': 'BarChart3',
+    'bar-graph': 'BarChart3',
+    'folder-open': 'FolderOpen',
+    'folder-closed': 'Folder',
+    'file-document': 'FileText',
+    'document': 'FileText',
+    'share-arrow': 'Share2',
+    'external-link': 'ExternalLink',
+    'link': 'Link',
+    'copy': 'Copy',
+    'duplicate': 'Copy',
+    'edit': 'Edit',
+    'pencil': 'Edit',
+    'modify': 'Edit',
+    'delete': 'Trash2',
+    'remove': 'Trash2',
+    'close': 'X',
+    'exit': 'X',
+    'cancel': 'X',
+    'logout': 'LogOut',
+    'sign-out': 'LogOut',
+    'signin': 'LogIn',
+    'login': 'LogIn',
+    'log-in': 'LogIn'
   };
+
 
 
   const mappedName = iconMappings[iconName.toLowerCase()];
