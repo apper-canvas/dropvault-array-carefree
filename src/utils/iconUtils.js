@@ -48,7 +48,7 @@ export const getIcon = (iconName) => {
     return LucideIcons[noSpaces];
   }
   
-  // Step 5: Try common icon mappings
+  // Step 5: Try comprehensive icon mappings
   const iconMappings = {
     // File type icons
     'file-audio': 'FileAudio',
@@ -68,7 +68,6 @@ export const getIcon = (iconName) => {
     'folder': 'Folder',
     'file': 'File',
     'file-text': 'FileText',
-    'image': 'Image',
     'archive': 'Archive',
     'video': 'Video',
     'download': 'Download',
@@ -90,8 +89,36 @@ export const getIcon = (iconName) => {
     'trash-2': 'Trash2',
     'help-circle': 'HelpCircle',
     'mail': 'Mail',
-    'chevron-down': 'ChevronDown'
+    'chevron-down': 'ChevronDown',
+    
+    // Navigation and Header icons
+    'menu': 'Menu',
+    'search': 'Search',
+    'bell': 'Bell',
+    'user': 'User',
+    'users': 'Users',
+    'settings': 'Settings',
+    'log-out': 'LogOut',
+    'upload': 'Upload',
+    'layout-dashboard': 'LayoutDashboard',
+    'bar-chart-3': 'BarChart3',
+    
+    // Additional common icons
+    'globe': 'Globe',
+    'trending-up': 'TrendingUp',
+    'heart': 'Heart',
+    'eye': 'Eye',
+    'alert-triangle': 'AlertTriangle',
+    'file-text': 'FileText',
+    'x-circle': 'XCircle',
+    'message-circle': 'MessageCircle',
+    'send': 'Send',
+    'phone': 'Phone',
+    'map-pin': 'MapPin',
+    'book': 'Book',
+    'info': 'Info'
   };
+
 
   const mappedName = iconMappings[iconName.toLowerCase()];
   if (mappedName && LucideIcons[mappedName] && typeof LucideIcons[mappedName] === 'function') {
