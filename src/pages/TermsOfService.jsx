@@ -9,29 +9,7 @@ const TermsOfService = () => {
   const CheckCircleIcon = getIcon('check-circle');
   const XCircleIcon = getIcon('x-circle');
 
-  return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
-      {/* Header */}
-      <header className="bg-white dark:bg-surface-800 shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
-                <LogoIcon className="h-6 w-6" />
-              </div>
-              <h1 className="ml-3 text-xl font-bold">DropVault</h1>
-            </Link>
-            
-            <Link 
-              to="/" 
-              className="flex items-center text-surface-600 dark:text-surface-400 hover:text-primary transition-colors"
-            >
-              <ArrowLeftIcon className="h-4 w-4 mr-2" />
-              Back to Home
-            </Link>
-          </div>
-        </div>
-      </header>
 
       {/* Content */}
       <main className="container mx-auto px-4 py-8">
