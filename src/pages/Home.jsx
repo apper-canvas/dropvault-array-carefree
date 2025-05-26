@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getIcon } from '../utils/iconUtils';
 import MainFeature from '../components/MainFeature';
+import Chart from 'react-apexcharts';
+
 import { motion } from 'framer-motion';
 
 const Home = () => {
@@ -78,16 +80,154 @@ const Home = () => {
             </Link>
           </div>
           
-          <div className="bg-white dark:bg-surface-800 rounded-xl p-4 shadow-card">
-            <div className="mb-2 flex justify-between items-center">
-              <span className="text-sm font-medium">2.4 GB of 5 GB used</span>
-              <span className="text-xs text-surface-500">48%</span>
+          {/* Storage Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Overall Usage Donut Chart */}
+            <div className="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-card">
+              <h3 className="text-lg font-semibold mb-4">Storage Overview</h3>
+              <div className="flex items-center justify-center">
+                <Chart
+                  options={{
+                    chart: {
+                      type: 'donut',
+                      background: 'transparent',
+                      toolbar: { show: false }
+                    },
+                    theme: {
+                      mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                    },
+                    colors: ['#4f46e5', '#e2e8f0'],
+                    labels: ['Used', 'Available'],
+                    legend: {
+                      position: 'bottom',
+                      labels: {
+                        colors: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#334155'
+                      }
+                    },
+                    plotOptions: {
+                      pie: {
+                        donut: {
+                          size: '70%',
+                          labels: {
+                            show: true,
+                            total: {
+                              show: true,
+                              label: 'Total',
+                              formatter: () => '5 GB'
+                            },
+                            value: {
+                              show: true,
+                              fontSize: '24px',
+                              fontWeight: 600,
+                              color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#334155',
+                              formatter: (val) => `${val}%`
+                            }
+                          }
+                        }
+                      }
+                    },
+                    dataLabels: {
+                      enabled: false
+                    },
+                    tooltip: {
+                      theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                    }
+                  }}
+                  series={[48, 52]}
+                  type="donut"
+                  height={280}
+                />
+              </div>
+              <div className="mt-4 text-center">
+                <p className="text-sm text-surface-600 dark:text-surface-400">
+                  2.4 GB of 5 GB used
+                </p>
+              </div>
             </div>
-            <div className="h-2 bg-surface-200 dark:bg-surface-700 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-primary to-secondary rounded-full" style={{ width: '48%' }}></div>
+
+            {/* File Types Breakdown Bar Chart */}
+            <div className="bg-white dark:bg-surface-800 rounded-xl p-6 shadow-card">
+              <h3 className="text-lg font-semibold mb-4">Storage by File Type</h3>
+              <Chart
+                options={{
+                  chart: {
+                    type: 'bar',
+                    background: 'transparent',
+                    toolbar: { show: false }
+                  },
+                  theme: {
+                    mode: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                  },
+                  colors: ['#4f46e5'],
+                  plotOptions: {
+                    bar: {
+                      horizontal: true,
+                      borderRadius: 4,
+                      dataLabels: {
+                        position: 'top'
+                      }
+                    }
+                  },
+                  dataLabels: {
+                    enabled: true,
+                    formatter: (val) => `${val} MB`,
+                    style: {
+                      colors: [document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#334155']
+                    }
+                  },
+                  xaxis: {
+                    categories: ['Documents', 'Images', 'Videos', 'Archives', 'Other'],
+                    labels: {
+                      style: {
+                        colors: document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#64748b'
+                      }
+                    }
+                  },
+                  yaxis: {
+                    labels: {
+                      style: {
+                        colors: document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#64748b'
+                      }
+                    }
+                  },
+                  grid: {
+                    borderColor: document.documentElement.classList.contains('dark') ? '#334155' : '#e2e8f0'
+                  },
+                  tooltip: {
+                    theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
+                  }
+                }}
+                series={[{
+                  name: 'Storage Used',
+                  data: [850, 720, 450, 280, 160]
+                }]}
+                type="bar"
+                height={280}
+              />
+            </div>
+          </div>
+
+          {/* Storage Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
+              <div className="text-2xl font-bold text-primary">156</div>
+              <div className="text-sm text-surface-600 dark:text-surface-400">Total Files</div>
+            </div>
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
+              <div className="text-2xl font-bold text-secondary">12</div>
+              <div className="text-sm text-surface-600 dark:text-surface-400">Folders</div>
+            </div>
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
+              <div className="text-2xl font-bold text-accent">8</div>
+              <div className="text-sm text-surface-600 dark:text-surface-400">Shared</div>
+            </div>
+            <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
+              <div className="text-2xl font-bold text-green-500">2.6 GB</div>
+              <div className="text-sm text-surface-600 dark:text-surface-400">Available</div>
             </div>
           </div>
         </div>
+
         
         {/* Content based on active tab */}
         {activeTab === 'upload' && (
