@@ -78,6 +78,8 @@ const Contact = () => {
     }
   };
 
+  return (
+
     <div className="min-h-screen bg-surface-50 dark:bg-surface-900">
 
       {/* Content */}
