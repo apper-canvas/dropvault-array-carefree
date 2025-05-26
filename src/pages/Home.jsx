@@ -208,7 +208,6 @@ const Home = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
 
           {/* Storage Stats Cards */}
             <div className="bg-white dark:bg-surface-800 rounded-lg p-4 shadow-card text-center">
@@ -266,6 +265,8 @@ const Home = () => {
             </div>
           </div>
         )}
+      </main>
+
       </main>
       
       {/* Footer */}
