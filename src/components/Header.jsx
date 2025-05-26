@@ -46,13 +46,13 @@ const Header = () => {
       path: '/',
       dropdown: [
         { label: 'Overview', path: '/', icon: 'layout-dashboard' },
-        { label: 'Analytics', path: '/analytics', icon: 'bar-chart-3' },
+        { label: 'Analytics', path: '/analytics', icon: 'bar-chart-2' },
         { label: 'Recent Activity', path: '/activity', icon: 'clock' }
       ]
     },
     {
       label: 'Files',
-      icon: 'folder',
+      icon: 'folder-open',
       path: '/files',
       dropdown: [
         { label: 'My Files', path: '/files', icon: 'folder' },
@@ -63,7 +63,7 @@ const Header = () => {
     },
     {
       label: 'Account',
-      icon: 'user',
+      icon: 'user-circle',
       dropdown: [
         { label: 'Profile', path: '/profile', icon: 'user' },
         { label: 'Settings', path: '/settings', icon: 'settings' },
@@ -77,11 +77,12 @@ const Header = () => {
       dropdown: [
         { label: 'FAQ', path: '/faq', icon: 'help-circle' },
         { label: 'Contact Support', path: '/contact', icon: 'mail' },
-        { label: 'About', path: '/about', icon: 'info' },
-        { label: 'Documentation', path: '/docs', icon: 'book' }
+        { label: 'About', path: '/about', icon: 'info-circle' },
+        { label: 'Documentation', path: '/docs', icon: 'book-open' }
       ]
     }
   ];
+
   
   // Mock notifications
   const notifications = [
