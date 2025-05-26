@@ -229,7 +229,6 @@ const Home = () => {
               <div className="text-sm text-surface-600 dark:text-surface-400">Available</div>
             </div>
           </div>
-          </div>
 
         </div>
 
