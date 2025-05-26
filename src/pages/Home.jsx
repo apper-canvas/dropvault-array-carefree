@@ -24,50 +24,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Header */}
-      <header className="bg-white dark:bg-surface-800 shadow-sm sticky top-0 z-10">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            {/* Logo */}
-            <div className="flex items-center">
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
-                <LogoIcon className="h-6 w-6" />
-              </div>
-              <h1 className="ml-3 text-xl font-bold">DropVault</h1>
-            </div>
-            
-            {/* Navigation Tabs */}
-            <nav className="flex space-x-1 bg-surface-100 dark:bg-surface-700 p-1 rounded-lg overflow-x-auto scrollbar-hide">
-              {tabs.map((tab) => {
-                const TabIcon = getIcon(tab.icon);
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`relative flex items-center px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 ease-in-out 
-                    ${activeTab === tab.id 
-                      ? 'text-white' 
-                      : 'text-surface-700 dark:text-surface-300 hover:text-surface-900 hover:dark:text-white'}`}
-                  >
-                    {activeTab === tab.id && (
-                      <motion.div 
-                        layoutId="activeTab"
-                        className="absolute inset-0 bg-gradient-to-r from-primary to-secondary rounded-md"
-                        initial={false}
-                        transition={{ type: 'spring', duration: 0.5 }}
-                      />
-                    )}
-                    <span className="flex items-center relative z-10">
-                      <TabIcon className={`mr-2 h-4 w-4 ${activeTab === tab.id ? 'text-white' : ''}`} />
-                      {tab.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </nav>
-          </div>
-        </div>
-      </header>
+      {/* Main Content */}
+
 
       {/* Main Content */}
       <main className="flex-1 container mx-auto px-4 py-8">
