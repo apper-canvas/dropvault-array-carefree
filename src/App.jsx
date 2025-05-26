@@ -48,6 +48,8 @@ function App() {
       {/* Main content */}
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/upgrade" element={<UpgradeStorage />} />
+
         <Route path="/contact" element={<Contact />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
